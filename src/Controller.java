@@ -18,6 +18,9 @@ public class Controller implements Initializable {
     char pnpSeparator = ',';
     String designatorPostfix = "-";
 
+    String csvSeperator = ",";
+    String csvPartSeperator = " ";
+
     //  PnP
     int iPnpDesignator = 0;
     int iPnpMidX = 1;
@@ -172,7 +175,7 @@ public class Controller implements Initializable {
         // BOM Writing
         bomFile.createNewFile();
         FileWriter bomWriter = new FileWriter(bomFile);
-        bomWriter.write("Comment;Designator;Footprint;LCSC Part # (optional)\n");
+        bomWriter.write("Comment" + csvSeperator + "Designator" + csvSeperator + "Footprint" + csvSeperator + "LCSC Part # (optional)\r\n");
 
         PartList bomList = new PartList();
 
@@ -184,24 +187,26 @@ public class Controller implements Initializable {
             Part part = bomList.parts.get(i);
 
             // First, check for equality
-            for (int j = i+1; j < bomList.parts.size(); j++) {
+            for (int j = i+1; j < bomList.parts.size();) {
                 Part mayEqualPart = bomList.parts.get(j);
 
                 if (part.comment.equals(mayEqualPart.comment) &&
                     part.footprint.equals(mayEqualPart.footprint)) {
-                    part.designator += "," + mayEqualPart.designator;
+                    part.designator += csvPartSeperator + mayEqualPart.designator;
                     bomList.parts.remove(mayEqualPart);
+                } else {
+                    j++;
                 }
             }
 
             // Next, write to File
-            bomWriter.write(part.comment + ";" +  part.designator + ";" + part.footprint + ";" + part.lcscPart + "\n");
+            bomWriter.write(part.comment + csvSeperator + part.designator + csvSeperator + part.footprint + csvSeperator + part.lcscPart + "\r\n");
         }
 
         // Next, PnP Writing
         pnpFile.createNewFile();
         FileWriter pnpWriter = new FileWriter(pnpFile);
-        pnpWriter.write("Designator;Mid X;Mid Y;Layer;Rotation\n");
+        pnpWriter.write("Designator" + csvSeperator + "Mid X" + csvSeperator + "Mid Y" + csvSeperator + "Layer" + csvSeperator + "Rotation\r\n");
 
         PartList pnpList = new PartList();
 
@@ -210,7 +215,7 @@ public class Controller implements Initializable {
         }
 
         for (Part part : pnpList.parts) {
-            pnpWriter.write(part.designator + ";" + part.midX + ";" + part.midY + ";" + part.layer + ";" + part.rotation + "\n");
+            pnpWriter.write(part.designator + csvSeperator + part.midX + csvSeperator + part.midY + csvSeperator + part.layer + csvSeperator + part.rotation + "\r\n");
         }
 
         fileChooser.getExtensionFilters().clear();
