@@ -3,6 +3,7 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
 <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="831.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
    <children>
@@ -109,12 +110,17 @@
                         </Label>
                      </children>
                   </HBox>
+                  <Button fx:id="createBoardsButton" mnemonicParsing="false" onAction="#onBoardsCreate" prefWidth="240.0" text="Create Boards">
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </VBox.margin>
+                  </Button>
                   <Button fx:id="createPanelButton" disable="true" layoutX="15.0" layoutY="283.0" mnemonicParsing="false" onAction="#onPanelCreate" prefWidth="240.0" text="Create Parts">
                      <VBox.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </VBox.margin>
                   </Button>
-                  <Button fx:id="clearButton" disable="true" layoutX="15.0" layoutY="318.0" mnemonicParsing="false" onAction="#clear" prefWidth="240.0" text="Clear">
+                  <Button fx:id="clearButton" layoutX="15.0" layoutY="318.0" mnemonicParsing="false" onAction="#clear" prefWidth="240.0" text="Clear">
                      <VBox.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </VBox.margin>
@@ -123,15 +129,13 @@
             </VBox>
             <HBox alignment="CENTER">
                <children>
-                  <ProgressBar fx:id="progressBar" prefHeight="18.0" prefWidth="180.0" progress="0.0" HBox.hgrow="ALWAYS">
+                  <Button fx:id="exportButton" disable="true" mnemonicParsing="false" onAction="#export" prefHeight="50.0" prefWidth="240.0" text="Export" HBox.hgrow="ALWAYS">
                      <HBox.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </HBox.margin>
-                  </ProgressBar>
-                  <Button fx:id="exportButton" disable="true" mnemonicParsing="false" onAction="#export" text="Export">
-                     <HBox.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                     </HBox.margin>
+                     <font>
+                        <Font size="18.0" />
+                     </font>
                   </Button>
                </children>
             </HBox>
@@ -154,6 +158,22 @@
                      </children></AnchorPane>
             </content>
           </Tab>
+           <Tab text="Boards">
+              <content>
+                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                    <children>
+                       <ScrollPane fitToHeight="true" fitToWidth="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <content>
+                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0">
+                                <children>
+                                   <TableView fx:id="boardsTable" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                </children>
+                             </AnchorPane>
+                          </content>
+                       </ScrollPane>
+                    </children></AnchorPane>
+              </content>
+           </Tab>
         </tabs>
          <opaqueInsets>
             <Insets />

@@ -17,6 +17,7 @@ public class Controller implements Initializable {
 
     char pnpSeparator = ',';
     String designatorPostfix = "-";
+    String boardPrefix = "B-";
 
     String csvSeperator = ",";
     String csvPartSeperator = " ";
@@ -51,25 +52,30 @@ public class Controller implements Initializable {
     public TextField offsetYField;
 
     @FXML
+    public Button createBoardsButton;
+    @FXML
     public Button createPanelButton;
     @FXML
     public Button clearButton;
     @FXML
     public Button exportButton;
-    @FXML
-    public ProgressBar progressBar;
 
     @FXML
     public TableView partsTable;
+    @FXML
+    public TableView boardsTable;
 
 
     PartList activePartList;
+    BoardList activeBoardList;
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         fileChooser = new FileChooser();
+        activeBoardList = new BoardList();
         preBuildPartTable();
+        preBuildBoardTable();
     }
 
     public void setStage(Stage stage) {
@@ -96,7 +102,7 @@ public class Controller implements Initializable {
     }
 
     @FXML
-    void onPanelCreate() {
+    void onBoardsCreate() {
         float firstX = Float.parseFloat(firstBoardXField.getText());
         float firstY = Float.parseFloat(firstBoardYField.getText());
         float offX = Float.parseFloat(offsetXField.getText());
@@ -104,33 +110,45 @@ public class Controller implements Initializable {
         int amountX = Integer.parseInt(amoutXField.getText());
         int amountY = Integer.parseInt(amoutYField.getText());
 
-        PartList newParts = new PartList();
+        for (int x = 0; x < amountX; x++) {
+            for (int y = 0; y < amountY; y++) {
+                Board newBoard = new Board();
+                newBoard.designator = boardPrefix + activeBoardList.boards.size();
+                newBoard.x = firstX + ((float)x * offX);
+                newBoard.y = firstY + ((float)y * offY);
 
-        if (activePartList != null) {
-            for (Part part : activePartList.parts) {
-                part.midX += firstX;
-                part.midY += firstY;
+                activeBoardList.boards.add(newBoard);
+            }
+        }
 
-                for (int i = 0; i < amountX; i++) {
-                    for (int j = 0; j < amountY; j++) {
-                        if (!(i == 0 && j == 0)) {
-                            Part newPart = new Part(part);
-                            newPart.midX += offX * (float)i;
-                            newPart.midY += offY * (float)j;
-                            newPart.designator += designatorPostfix + i + designatorPostfix + j;
+        updateBoardTable();
+    }
 
-                            newParts.parts.add(newPart);
-                        }
-                    }
+    @FXML
+    void onPanelCreate() {
+        if (activeBoardList == null) {
+            if (activeBoardList.boards.size() <= 0) {
+                return;
+            }
+        }
+
+        if (activePartList != null && activePartList.parts.size() > 0) {
+            PartList originalParts = activePartList;
+            activePartList = new PartList();
+
+            for (Board board : activeBoardList.boards) {
+                for (Part originalPart : originalParts.parts) {
+                    Part newPart = new Part(originalPart);
+
+                    newPart.midX += board.x;
+                    newPart.midY += board.y;
+                    newPart.designator += designatorPostfix + board.designator;
+
+                    activePartList.parts.add(newPart);
                 }
-
-                part.designator += designatorPostfix + 0 + designatorPostfix + 0;
             }
 
-            for (Part newPart : newParts.parts) {
-                activePartList.parts.add(newPart);
-            }
-
+            createBoardsButton.setDisable(true);
             createPanelButton.setDisable(true);
             updatePartTable();
         }
@@ -138,18 +156,18 @@ public class Controller implements Initializable {
 
     @FXML
     void clear() {
+        createBoardsButton.setDisable(false);
         createPanelButton.setDisable(true);
-        clearButton.setDisable(true);
         exportButton.setDisable(true);
 
         activePartList = null;
+        activeBoardList = new BoardList();
 
         pnpPath.setText("");
         pnpButton.setDisable(false);
 
-        progressBar.setProgress(0.0);
-
         updatePartTable();
+        updateBoardTable();
     }
 
     @FXML
@@ -316,6 +334,31 @@ public class Controller implements Initializable {
         return currentPartList;
     }
 
+    void preBuildBoardTable() {
+        TableColumn<Board, String> designatorColumn = new TableColumn<>("Designator");
+        designatorColumn.setCellValueFactory(new PropertyValueFactory<>("designator"));
+
+        TableColumn<Board, Float> xColumn = new TableColumn<>("X");
+        xColumn.setCellValueFactory(new PropertyValueFactory<>("x"));
+
+        TableColumn<Board, Float> yColumn = new TableColumn<>("Y");
+        yColumn.setCellValueFactory(new PropertyValueFactory<>("y"));
+
+        boardsTable.getColumns().addAll(designatorColumn, xColumn, yColumn);
+    }
+
+    void updateBoardTable() {
+        // Clear Table
+        boardsTable.getItems().clear();
+
+        if (activeBoardList != null) {
+            for (Board board : activeBoardList.boards) {
+                boardsTable.getItems().add(board);
+            }
+        }
+
+        boardsTable.refresh();
+    }
 
     void preBuildPartTable() {
         TableColumn<Part, String> designatorColumn = new TableColumn<>("Designator");
